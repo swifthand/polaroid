@@ -22,7 +22,7 @@ private #######################################################################
   # of sending an instance the assigned messages, and returns them as a Hash.
   def define_capture_method
     messages = @messages
-    take_snapshot = ->(format = :json) {
+    take_snapshot = ->(format = :hash) {
       snapshot = self.class::Snapshot.new(*(messages.map { |msg| self.send(msg) })).to_h
       format == :json ? snapshot.to_json : snapshot
     }
@@ -31,11 +31,12 @@ private #######################################################################
 
 
   module ClassMethods
-    def build_from_snapshot(snapshot_hash, from = :hash)
+    def build_from_snapshot(snapshot_hash, format = :hash)
       case from
       when :hash
+        # This line intentionally left blank
       when :json
-        snapshot_hash = JSON
+        snapshot_hash = JSON.parse(snapshot_hash)
       end
       self::Snapshot.new(snapshot_hash)
     end
