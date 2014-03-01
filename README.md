@@ -66,7 +66,7 @@ And if we make a `Person` instance, we can take a snapshot, which by default is 
 But now we can take that snapshot Hash and build a fake Person (actual class is `Person::Snapshot`) that responds to all the messages we chose to record from the original `Person`:
 
     fake_pat = Person.build_from_snapshot(snapshot)
-    # => #<struct Person::Snapshot name="Patrick", age=25, favorite_foods=["ramen", "pie"], favorite_drinks=["beer", "coffee"]>
+    # => #<struct Person::Snapshot name="Patrick", age=25, favorite_drinks=["beer", "coffee"]>
     fake_pat.age
     # => 25
     fake_pat.favorite_drinks
