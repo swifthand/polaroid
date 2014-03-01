@@ -22,71 +22,80 @@ In a class of which you would like to have a Snapshot, include a new instance of
 
 An example of a Person class with two attributes, and a method which selects
 
-    class Person
-      include Polaroid.new(:name, :age, :favorite_drinks)
+```ruby
+class Person
+  include Polaroid.new(:name, :age, :favorite_drinks)
 
-      attr_reader :name, :age, :favorites
+  attr_reader :name, :age, :favorites
 
-      def initialize(name, age, favorites)
-        @name       = name
-        @age        = age
-        @favorites  = favorites
-      end
+  def initialize(name, age, favorites)
+    @name       = name
+    @age        = age
+    @favorites  = favorites
+  end
 
-      def favorite_drinks
-        favorites.select { |fav| drink?(fav) }
-      end
+  def favorite_drinks
+    favorites.select { |fav| drink?(fav) }
+  end
 
-      def favorite_foods
-        favorites.select { |fav| food?(fav) }
-      end
+  def favorite_foods
+    favorites.select { |fav| food?(fav) }
+  end
 
-      def drink?(str)
-        %w[coffee beer wine tea water juice].include?(str)
-      end
+  def drink?(str)
+    %w[coffee beer wine tea water juice].include?(str)
+  end
 
-      def food?(str)
-        %w[omelete burrito ramen pie yogurt].include?(str)
-      end
-    end
+  def food?(str)
+    %w[omelete burrito ramen pie yogurt].include?(str)
+  end
+end
+```
 
 And if we make a `Person` instance, we can take a snapshot, which by default is just a `Hash`.
 
-    pat = Person.new('Patrick', 25, ['beer', 'coffee', 'ramen', 'pie'])
-    # => #<Person @name="Patrick", @age=25, @favorites=["beer", "coffee", "ramen", "pie"]>
-    pat.age
-    # => 25
-    pat.favorite_drinks
-    # => ["beer", "coffee"]
-    pat.favorite_foods
-    # => ["ramen", "pie"]
-    snapshot = pat.take_shapshot
-    # => { name: "Patrick", age: 25, favorite_drinks: ["beer", "coffee"] }
+```ruby
+pat = Person.new('Patrick', 25, ['beer', 'coffee', 'ramen', 'pie'])
+# => #<Person @name="Patrick", @age=25, @favorites=["beer", "coffee", "ramen", "pie"]>
+pat.age
+# => 25
+pat.favorite_drinks
+# => ["beer", "coffee"]
+pat.favorite_foods
+# => ["ramen", "pie"]
+snapshot = pat.take_shapshot
+# => { name: "Patrick", age: 25, favorite_drinks: ["beer", "coffee"] }
+```
 
 But now we can take that snapshot Hash and build a fake Person (actual class is `Person::Snapshot`) that responds to all the messages we chose to record from the original `Person`:
 
-    fake_pat = Person.build_from_snapshot(snapshot)
-    # => #<struct Person::Snapshot name="Patrick", age=25, favorite_drinks=["beer", "coffee"]>
-    fake_pat.age
-    # => 25
-    fake_pat.favorite_drinks
-    # => ["beer", "coffee"]
+```ruby
+fake_pat = Person.build_from_snapshot(snapshot)
+# => #<struct Person::Snapshot name="Patrick", age=25, favorite_drinks=["beer", "coffee"]>
+fake_pat.age
+# => 25
+fake_pat.favorite_drinks
+# => ["beer", "coffee"]
+```
 
 However, since we did not record the whole `favorites` array, nor did we ask the message `favorite_foods` be included our snapshot, the `Person::Snapshot` does not respond to `favorite_foods`:
 
-    fake_pat.favorite_foods
-    # => NoMethodError: undefined method `favorite_foods' for #<Person::Snapshot>
-
+```ruby
+fake_pat.favorite_foods
+# => NoMethodError: undefined method `favorite_foods' for #<Person::Snapshot>
+```
 
 ## Hashes? But I want JSON!
 
 Of course you do. So the `take_snapshot` and `build_from_snapshot` methods also take a trailing `format` parameter:
 
-    pat = Person.new('Patrick', 25, ['beer', 'coffee', 'ramen', 'pie'])
-    json_snapshot = snapshot.take_snapshot(pat, :json)
-    # => "{\"name\":\"Patrick\",\"age\":25,\"favorite_drinks\":[\"beer\",\"coffee\"]}"
-    Person.build_from_snapshot(json_snapshot, :json)
-    # => #<struct Person::Snapshot name="Patrick", age=25, favorite_drinks=["beer", "coffee"]>
+```ruby
+pat = Person.new('Patrick', 25, ['beer', 'coffee', 'ramen', 'pie'])
+json_snapshot = snapshot.take_snapshot(pat, :json)
+# => "{\"name\":\"Patrick\",\"age\":25,\"favorite_drinks\":[\"beer\",\"coffee\"]}"
+Person.build_from_snapshot(json_snapshot, :json)
+# => #<struct Person::Snapshot name="Patrick", age=25, favorite_drinks=["beer", "coffee"]>
+```
 
 Right now the only accepted formats are `:hash` and `:json`. If there are other serialization formats that people care about, I would be happy to have them included.
 
