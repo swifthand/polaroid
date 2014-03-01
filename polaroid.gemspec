@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email          = ["paul@groupraise.com"]
   spec.summary        = %q{Polaroid provides shortcuts to capture the state of a Ruby object, and can construct a fake object later to mimic that state.}
   spec.description    = %q{Polaroid provides shortcuts to capture the state of a Ruby object, and can construct a fake object later to represents that state. The goal is to "Never send a Hash to do an Object's job" when performing common tasks such as, sending data to a background worker as JSON, or otherwise.}
-  spec.homepage       = ""
+  spec.homepage       = "https://github.com/swifthand/polaroid"
   spec.license        = "MIT"
 
   spec.files          = `git ls-files -z`.split("\x0")
@@ -20,8 +20,8 @@ Gem::Specification.new do |spec|
   spec.require_paths  = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rake", "~> 10.0"
 
   spec.add_runtime_dependency "immutable_struct", "~> 1.1"
+  spec.add_runtime_dependency "json", "~> 1.8"
 end
-

@@ -9,7 +9,7 @@ class Polaroid < Module
     freeze
   end
 
-
+  # Build the fake class for internal use in the including class' namespace.
   def included(base)
     base.const_set(:Snapshot, @polaroid_struct_class)
     base.extend(ClassMethods)
@@ -18,15 +18,25 @@ class Polaroid < Module
 
 private #######################################################################
 
+  # Give the class a #take_snapshot instance method, which records the result
+  # of sending an instance the assigned messages, and returns them as a Hash.
   def define_capture_method
     messages = @messages
-    define_method(:take_snapshot) do
-      self.class::Snapshot.new(*(messages.map { |msg| self.send(msg) })).to_h
-    end
+    take_snapshot = ->(format = :json) {
+      snapshot = self.class::Snapshot.new(*(messages.map { |msg| self.send(msg) })).to_h
+      format == :json ? snapshot.to_json : snapshot
+    }
+    define_method(:take_snapshot, &take_snapshot)
   end
 
+
   module ClassMethods
-    def build_from_snapshot(snapshot_hash)
+    def build_from_snapshot(snapshot_hash, from = :hash)
+      case from
+      when :hash
+      when :json
+        snapshot_hash = JSON
+      end
       self::Snapshot.new(snapshot_hash)
     end
   end
