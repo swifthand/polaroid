@@ -1,6 +1,6 @@
 class Polaroid < Module
 
-  VERSION = "0.0.1"
+  VERSION = "0.0.3"
 
   def initialize(*messages)
     @messages = messages
@@ -32,11 +32,13 @@ private #######################################################################
 
   module ClassMethods
     def build_from_snapshot(snapshot_hash, format = :hash)
-      case from
+      case format
       when :hash
         # This line intentionally left blank
       when :json
-        snapshot_hash = JSON.parse(snapshot_hash)
+        snapshot_hash = JSON.parse(snapshot_hash).map.with_object({}) do |(k, v), hash|
+          hash[k.to_sym] = v
+        end
       end
       self::Snapshot.new(snapshot_hash)
     end
