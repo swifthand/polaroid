@@ -32,17 +32,29 @@ private #######################################################################
 
 
   module ClassMethods
-    def build_from_snapshot(snapshot, format = :hash)
-      case format
-      when :hash
-        snapshot_hash = snapshot.map.with_object({}) do |(k, v), hash|
-          hash[k.to_sym] = v
+    ##
+    # This method will try its damnedest to give you a meaningful snapshot object,
+    # but first it needs to somehow get it into a Hash. Either you can let it autodetect
+    # and give it a Hash-like, JSON String-like, or something which responds to #to_h or #to_s,
+    # or you can explicitly pass it the format as :hash or :json.
+    def build_from_snapshot(snapshot, format = :auto)
+      symbolize_keys  = ->((key, val), hash) { hash[key.to_sym] = val }
+      from_hash       = ->(snap) { snap.each.with_object({}, &symbolize_keys) }
+      from_json       = ->(snap) { JSON.parse(snap).each.with_object({}, &symbolize_keys) }
+      snapshot_hash   =
+        if    :auto == format && snapshot.is_a?(Hash)
+          from_hash.call(snapshot)
+        elsif :auto == format && snapshot.is_a?(String)
+          from_json.call(snapshot)
+        elsif :hash == format
+          from_hash.call(snapshot)
+        elsif :json == format
+          from_json.call(snapshot)
+        elsif snapshot.respond_to?(:to_h)
+          from_hash.call(snapshot)
+        else
+          from_json.call(snapshot.to_s)
         end
-      when :json
-        snapshot_hash = JSON.parse(snapshot).map.with_object({}) do |(k, v), hash|
-          hash[k.to_sym] = v
-        end
-      end
       self::Snapshot.new(snapshot_hash)
     end
   end
