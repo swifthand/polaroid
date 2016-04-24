@@ -91,7 +91,7 @@ Of course you do. So the `take_snapshot` and `build_from_snapshot` methods also 
 
 ```ruby
 pat = Person.new('Patrick', 25, ['beer', 'coffee', 'ramen', 'pie'])
-json_snapshot = snapshot.take_snapshot(pat, :json)
+json_snapshot = pat.take_snapshot(:json)
 # => "{\"name\":\"Patrick\",\"age\":25,\"favorite_drinks\":[\"beer\",\"coffee\"]}"
 Person.build_from_snapshot(json_snapshot, :json)
 # => #<struct Person::Snapshot name="Patrick", age=25, favorite_drinks=["beer", "coffee"]>

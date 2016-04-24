@@ -1,6 +1,7 @@
-class Polaroid < Module
+require 'json'
+require 'immutable_struct'
 
-  VERSION = "0.0.4"
+class Polaroid < Module
 
   def initialize(*messages)
     @messages = messages
